@@ -3,483 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market Open — Daily Brief</title>
+<title>Market Brief — Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #050a0e;
-    --panel: #0b1218;
-    --border: #1a2730;
-    --green: #00ff88;
-    --red: #ff3b5c;
-    --yellow: #ffd166;
-    --blue: #38b6ff;
-    --text: #e8f4f8;
-    --muted: #4a6572;
-    --accent: #00ff88;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px 20px;
-  }
-
-  /* HEADER */
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 32px;
-    animation: fadeDown 0.6s ease both;
-  }
-
-  .logo {
-    font-size: 11px;
-    font-family: 'Space Mono', monospace;
-    color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-  }
-
-  .logo span { color: var(--green); }
-
-  .clock-block { text-align: right; }
-
-  #clock {
-    font-family: 'Space Mono', monospace;
-    font-size: 22px;
-    color: var(--text);
-    letter-spacing: 2px;
-  }
-
-  #date-str {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    margin-top: 2px;
-  }
-
-  /* MARKET STATUS BANNER */
-  .market-banner {
-    border: 1px solid var(--border);
-    background: var(--panel);
-    border-radius: 12px;
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-    animation: fadeDown 0.6s 0.1s ease both;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .market-banner::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--green);
-    border-radius: 99px;
-  }
-
-  .market-banner.closed::after { background: var(--red); }
-  .market-banner.pre::after { background: var(--yellow); }
-
-  .status-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 10px var(--green);
-    flex-shrink: 0;
-    animation: pulse 1.5s infinite;
-  }
-
-  .market-banner.closed .status-dot { background: var(--red); box-shadow: 0 0 10px var(--red); animation: none; }
-  .market-banner.pre .status-dot { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .market-banner h2 { font-size: 15px; font-weight: 800; letter-spacing: 1px; }
-  .market-banner p { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
-
-  .market-banner .hours {
-    margin-left: auto;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  /* INDICES ROW */
-  .indices {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .index-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    animation: fadeUp 0.6s ease both;
-    transition: border-color 0.2s;
-    cursor: default;
-  }
-
-  .index-card:hover { border-color: var(--green); }
-  .index-card:nth-child(1) { animation-delay: 0.15s; }
-  .index-card:nth-child(2) { animation-delay: 0.2s; }
-  .index-card:nth-child(3) { animation-delay: 0.25s; }
-
-  .index-name {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .index-value {
-    font-size: 22px;
-    font-weight: 800;
-    margin: 6px 0 4px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .index-change {
-    font-size: 12px;
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-  }
-
-  .up { color: var(--green); }
-  .down { color: var(--red); }
-
-  /* SPARKLINE */
-  .sparkline { width: 100%; height: 32px; margin-top: 10px; }
-
-  /* MAIN GRID */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .card:nth-child(1) { animation-delay: 0.3s; }
-  .card:nth-child(2) { animation-delay: 0.35s; }
-
-  .card-title {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    font-family: 'Space Mono', monospace;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-title::before {
-    content: '';
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-  }
-
-  /* MOVERS */
-  .mover-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-  }
-
-  .mover-row:last-child { border-bottom: none; }
-  .mover-ticker { font-weight: 700; color: var(--text); }
-  .mover-name { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* FEAR & GREED */
-  .gauge-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
-
-  .gauge-arc {
-    width: 140px; height: 75px;
-    position: relative;
-    margin-bottom: 12px;
-  }
-
-  .gauge-label {
-    font-size: 28px;
-    font-weight: 800;
-    text-align: center;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .gauge-desc {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 4px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  /* RECOMMENDATION CARD */
-  .rec-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    animation: fadeUp 0.6s 0.4s ease both;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-
-  .rec-card::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 180px; height: 180px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,255,136,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .rec-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,255,136,0.08);
-    border: 1px solid rgba(0,255,136,0.25);
-    border-radius: 99px;
-    padding: 5px 14px;
-    font-size: 11px;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-    color: var(--green);
-    margin-bottom: 14px;
-  }
-
-  .rec-badge.neutral { background: rgba(255,209,102,0.08); border-color: rgba(255,209,102,0.25); color: var(--yellow); }
-  .rec-badge.avoid { background: rgba(255,59,92,0.08); border-color: rgba(255,59,92,0.25); color: var(--red); }
-
-  .rec-title {
-    font-size: 26px;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 12px;
-  }
-
-  .rec-body {
-    font-size: 13px;
-    color: #8aabb8;
-    line-height: 1.7;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .rec-factors {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .factor {
-    font-size: 10px;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border-radius: 99px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-
-  .factor.pos { color: var(--green); border-color: rgba(0,255,136,0.2); background: rgba(0,255,136,0.05); }
-  .factor.neg { color: var(--red); border-color: rgba(255,59,92,0.2); background: rgba(255,59,92,0.05); }
-
-  /* NEWS */
-  .news-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    animation: fadeUp 0.6s 0.45s ease both;
-    margin-bottom: 24px;
-  }
-
-  .news-item {
-    display: flex;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .news-item:hover { opacity: 0.75; }
-  .news-item:last-child { border-bottom: none; }
-
-  .news-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--muted);
-    flex-shrink: 0;
-    margin-top: 6px;
-  }
-
-  .news-dot.bullish { background: var(--green); }
-  .news-dot.bearish { background: var(--red); }
-  .news-dot.neutral { background: var(--yellow); }
-
-  .news-text { font-size: 12px; line-height: 1.5; color: var(--text); }
-  .news-meta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 3px; }
-
-  /* REFRESH BUTTON */
-  .refresh-btn {
-    width: 100%;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    animation: fadeUp 0.6s 0.5s ease both;
-  }
-
-  .refresh-btn:hover {
-    border-color: var(--green);
-    color: var(--green);
-    background: rgba(0,255,136,0.04);
-  }
-
-  /* LOADING OVERLAY */
-  #loader {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    flex-direction: column;
-    gap: 16px;
-    transition: opacity 0.4s;
-  }
-
-  .loader-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  .loader-bar {
-    width: 200px;
-    height: 2px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .loader-fill {
-    height: 100%;
-    background: var(--green);
-    border-radius: 99px;
-    animation: load 1.8s ease forwards;
-  }
-
-  @keyframes load {
-    from { width: 0; }
-    to { width: 100%; }
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .indices { grid-template-columns: 1fr; }
-    .main-grid { grid-template-columns: 1fr; }
-    .rec-title { font-size: 20px; }
-  }
+:root{--bg:#050a0e;--panel:#0b1218;--border:#1a2730;--green:#00ff88;--red:#ff3b5c;--yellow:#ffd166;--text:#e8f4f8;--muted:#4a6572}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:24px 20px}
+header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;animation:fadeDown .6s ease both}
+.logo{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+.logo span{color:var(--green)}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:99px;padding:3px 10px;font-size:10px;font-family:'Space Mono',monospace;color:var(--green);margin-top:6px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.clock-block{text-align:right}
+#clock{font-family:'Space Mono',monospace;font-size:22px;color:var(--text);letter-spacing:2px}
+#date-str{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:2px}
+.market-banner{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px;animation:fadeDown .6s .1s ease both;position:relative;overflow:hidden}
+.market-banner::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);border-radius:99px}
+.market-banner.closed::after{background:var(--red)}
+.market-banner.pre::after{background:var(--yellow)}
+.status-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);flex-shrink:0;animation:pulse 1.5s infinite}
+.market-banner h2{font-size:15px;font-weight:800;letter-spacing:1px}
+.market-banner p{font-size:12px;color:var(--muted);margin-top:2px;font-family:'Space Mono',monospace}
+.market-banner .hours{margin-left:auto;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);text-align:right}
+.indices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.index-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;animation:fadeUp .6s ease both;transition:border-color .2s}
+.index-card:hover{border-color:var(--green)}
+.index-name{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace}
+.index-value{font-size:22px;font-weight:800;margin:6px 0 4px;font-family:'Space Mono',monospace}
+.index-change{font-size:12px;font-family:'Space Mono',monospace;font-weight:700}
+.up{color:var(--green)}.down{color:var(--red)}
+.sparkline{width:100%;height:32px;margin-top:10px}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeUp .6s ease both}
+.card-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green)}
+.mover-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:12px}
+.mover-row:last-child{border-bottom:none}
+.mover-ticker{font-weight:700;color:var(--text)}
+.mover-name{font-size:10px;color:var(--muted);margin-top:2px}
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;margin-top:8px}
+.gauge-arc{width:140px;height:75px;margin-bottom:12px}
+.gauge-label{font-size:28px;font-weight:800;text-align:center;font-family:'Space Mono',monospace}
+.gauge-desc{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:4px;font-family:'Space Mono',monospace}
+.rec-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;animation:fadeUp .6s .4s ease both;position:relative;overflow:hidden;margin-bottom:20px}
+.rec-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.07) 0%,transparent 70%);pointer-events:none}
+.rec-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);border-radius:99px;padding:5px 14px;font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px;color:var(--green);margin-bottom:14px}
+.rec-badge.neutral{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.25);color:var(--yellow)}
+.rec-badge.avoid{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.25);color:var(--red)}
+.rec-title{font-size:24px;font-weight:800;line-height:1.2;margin-bottom:12px}
+.rec-body{font-size:13px;color:#8aabb8;line-height:1.7;font-family:'Space Mono',monospace}
+.rec-factors{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.factor{font-size:10px;font-family:'Space Mono',monospace;letter-spacing:1px;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
+.factor.pos{color:var(--green);border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.05)}
+.factor.neg{color:var(--red);border-color:rgba(255,59,92,.2);background:rgba(255,59,92,.05)}
+.news-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeUp .6s .45s ease both;margin-bottom:20px}
+.news-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);text-decoration:none}
+.news-item:last-child{border-bottom:none}
+.news-item:hover{opacity:.75}
+.news-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:6px}
+.news-dot.bullish{background:var(--green)}.news-dot.bearish{background:var(--red)}.news-dot.neutral{background:var(--yellow)}
+.news-text{font-size:12px;line-height:1.5;color:var(--text)}
+.news-meta{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:3px}
+.error-msg{font-family:'Space Mono',monospace;font-size:11px;color:var(--red);padding:8px;text-align:center}
+.refresh-btn{width:100%;background:transparent;border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.refresh-btn:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.04)}
+#lastUpdate{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:16px}
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:16px;transition:opacity .4s}
+.loader-text{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.loader-bar{width:200px;height:2px;background:var(--border);border-radius:99px;overflow:hidden}
+.loader-fill{height:100%;background:var(--green);border-radius:99px;animation:load 2s ease forwards}
+@keyframes load{from{width:0}to{width:100%}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.indices{grid-template-columns:1fr}.main-grid{grid-template-columns:1fr}.rec-title{font-size:19px}}
 </style>
 </head>
 <body>
-
-<!-- LOADER -->
 <div id="loader">
-  <div class="loader-text">Analizando mercado...</div>
+  <div class="loader-text">Conectando con mercados...</div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
 </div>
-
 <div class="container">
-
-  <!-- HEADER -->
   <header>
     <div>
       <div class="logo"><span>■</span> Market Brief</div>
-      <div style="font-size:18px;font-weight:800;margin-top:6px;">Buenos días, Trader.</div>
+      <div style="font-size:18px;font-weight:800;margin-top:6px">Buenos días, Trader.</div>
+      <div class="live-badge"><span class="live-dot"></span> DATOS EN VIVO · FINNHUB</div>
     </div>
     <div class="clock-block">
       <div id="clock">--:--:--</div>
@@ -487,359 +99,281 @@
     </div>
   </header>
 
-  <!-- MARKET STATUS -->
   <div class="market-banner" id="marketBanner">
     <div class="status-dot" id="statusDot"></div>
     <div>
-      <h2 id="marketStatusTitle">Cargando...</h2>
+      <h2 id="marketStatusTitle">Conectando...</h2>
       <p id="marketStatusSub">NYSE / NASDAQ</p>
     </div>
-    <div class="hours">
-      <div>Apertura: 9:30 AM ET</div>
-      <div>Cierre: 4:00 PM ET</div>
-    </div>
+    <div class="hours"><div>Apertura: 9:30 AM ET</div><div>Cierre: 4:00 PM ET</div></div>
   </div>
 
-  <!-- INDICES -->
   <div class="indices" id="indicesGrid">
-    <!-- populated by JS -->
+    <div class="index-card"><div class="index-name">S&P 500 (SPY)</div><div class="index-value" style="color:var(--muted)">---</div></div>
+    <div class="index-card"><div class="index-name">NASDAQ (QQQ)</div><div class="index-value" style="color:var(--muted)">---</div></div>
+    <div class="index-card"><div class="index-name">DOW (DIA)</div><div class="index-value" style="color:var(--muted)">---</div></div>
   </div>
 
-  <!-- MAIN GRID: MOVERS + FEAR & GREED -->
   <div class="main-grid">
     <div class="card">
-      <div class="card-title">Top Movers del Día</div>
-      <div id="moversContainer"></div>
+      <div class="card-title">Top Acciones del Día</div>
+      <div id="moversContainer"><div class="error-msg">Cargando...</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Fear &amp; Greed Index</div>
+      <div class="card-title">Sentimiento del Mercado</div>
       <div class="gauge-wrap">
         <svg class="gauge-arc" viewBox="0 0 140 80">
           <path d="M10,75 A60,60 0 0,1 130,75" fill="none" stroke="#1a2730" stroke-width="10" stroke-linecap="round"/>
           <path id="gaugeFill" d="M10,75 A60,60 0 0,1 130,75" fill="none" stroke="#00ff88" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 188"/>
-          <line id="gaugeNeedle" x1="70" y1="75" x2="70" y2="20" stroke="#00ff88" stroke-width="2" stroke-linecap="round" transform="rotate(0, 70, 75)"/>
+          <line id="gaugeNeedle" x1="70" y1="75" x2="70" y2="20" stroke="#00ff88" stroke-width="2" stroke-linecap="round" transform="rotate(0,70,75)"/>
           <circle cx="70" cy="75" r="4" fill="#00ff88"/>
         </svg>
         <div class="gauge-label" id="fgValue">--</div>
-        <div class="gauge-desc" id="fgLabel">Cargando...</div>
+        <div class="gauge-desc" id="fgLabel">Calculando...</div>
       </div>
     </div>
   </div>
 
-  <!-- RECOMMENDATION -->
   <div class="rec-card">
-    <div class="rec-badge" id="recBadge">● ANALIZANDO</div>
-    <div class="rec-title" id="recTitle">Evaluando condiciones del mercado...</div>
-    <div class="rec-body" id="recBody">Por favor espera mientras procesamos los datos de apertura del mercado.</div>
+    <div class="rec-badge" id="recBadge">● ANALIZANDO MERCADO</div>
+    <div class="rec-title" id="recTitle">Obteniendo datos en tiempo real...</div>
+    <div class="rec-body" id="recBody">Conectando con Finnhub para analizar las condiciones actuales del mercado.</div>
     <div class="rec-factors" id="recFactors"></div>
   </div>
 
-  <!-- NEWS -->
   <div class="news-card">
-    <div class="card-title">Noticias Relevantes</div>
-    <div id="newsContainer"></div>
+    <div class="card-title">Noticias del Mercado — En Vivo</div>
+    <div id="newsContainer"><div class="error-msg">Cargando noticias...</div></div>
   </div>
 
-  <!-- REFRESH -->
-  <button class="refresh-btn" onclick="loadData()">↺ Actualizar datos del mercado</button>
-
+  <button class="refresh-btn" onclick="loadAll()">↺ Actualizar datos del mercado</button>
+  <div id="lastUpdate"></div>
 </div>
 
 <script>
-// =====================
+const API_KEY = 'd6ismf9r01qleu95dl60d6ismf9r01qleu95dl6g';
+const BASE = 'https://finnhub.io/api/v1';
+
 // CLOCK
-// =====================
 function updateClock() {
   const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-
+  const p = n => String(n).padStart(2,'0');
+  document.getElementById('clock').textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
   const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  document.getElementById('date-str').textContent =
-    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('date-str').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-// =====================
 // MARKET STATUS (ET)
-// =====================
 function getMarketStatus() {
-  const now = new Date();
-  const et = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
-  const day = et.getDay();
-  const h = et.getHours();
-  const m = et.getMinutes();
-  const mins = h * 60 + m;
-
-  if (day === 0 || day === 6) return { status: 'closed', label: '🔴 Mercado Cerrado', sub: 'Los mercados no operan los fines de semana', etTime: et };
-  if (mins >= 4*60 && mins < 9*60+30) return { status: 'pre', label: '🟡 Pre-Mercado Activo', sub: 'Pre-market: 4:00 AM – 9:30 AM ET', etTime: et };
-  if (mins >= 9*60+30 && mins < 16*60) return { status: 'open', label: '🟢 Mercado Abierto', sub: 'NYSE / NASDAQ en operación', etTime: et };
-  if (mins >= 16*60 && mins < 20*60) return { status: 'after', label: '🟡 After-Hours', sub: 'After-hours: 4:00 PM – 8:00 PM ET', etTime: et };
-  return { status: 'closed', label: '🔴 Mercado Cerrado', sub: 'Reabre lunes a las 9:30 AM ET', etTime: et };
+  const et = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
+  const day = et.getDay(), mins = et.getHours()*60 + et.getMinutes();
+  if (day===0||day===6) return {status:'closed',label:'🔴 Mercado Cerrado',sub:'Los mercados no operan en fin de semana'};
+  if (mins>=240 && mins<570) return {status:'pre',label:'🟡 Pre-Mercado Activo',sub:'Pre-market: 4:00 AM – 9:30 AM ET'};
+  if (mins>=570 && mins<960) return {status:'open',label:'🟢 Mercado Abierto',sub:'NYSE / NASDAQ en plena operación'};
+  if (mins>=960 && mins<1200) return {status:'after',label:'🟡 After-Hours',sub:'After-hours: 4:00 PM – 8:00 PM ET'};
+  return {status:'closed',label:'🔴 Mercado Cerrado',sub:'Reabre el próximo día hábil a las 9:30 AM ET'};
 }
 
 function renderMarketStatus() {
-  const { status, label, sub } = getMarketStatus();
+  const {status,label,sub} = getMarketStatus();
   const banner = document.getElementById('marketBanner');
   const dot = document.getElementById('statusDot');
-  banner.className = 'market-banner ' + (status === 'open' ? '' : status === 'pre' || status === 'after' ? 'pre' : 'closed');
-  if (status === 'closed') { dot.style.background = 'var(--red)'; dot.style.boxShadow = '0 0 10px var(--red)'; }
-  else if (status === 'pre' || status === 'after') { dot.style.background = 'var(--yellow)'; dot.style.boxShadow = '0 0 10px var(--yellow)'; }
-  else { dot.style.background = 'var(--green)'; dot.style.boxShadow = '0 0 10px var(--green)'; }
+  banner.className = 'market-banner ' + (status==='open'?'':status==='closed'?'closed':'pre');
+  const c = {open:'var(--green)',closed:'var(--red)',pre:'var(--yellow)',after:'var(--yellow)'}[status]||'var(--muted)';
+  dot.style.background = c; dot.style.boxShadow = `0 0 10px ${c}`;
+  if (status!=='open') dot.style.animation = 'none';
   document.getElementById('marketStatusTitle').textContent = label;
   document.getElementById('marketStatusSub').textContent = sub;
 }
 
-// =====================
-// SIMULATED MARKET DATA
-// (In production: replace with Alpha Vantage / Yahoo Finance API)
-// =====================
-function generateMarketData() {
-  const base = {
-    spx: { name: 'S&P 500', base: 5280 },
-    ndx: { name: 'NASDAQ', base: 18400 },
-    dji: { name: 'DOW JONES', base: 39500 },
-  };
-
-  const randomChange = (max) => (Math.random() * max * 2 - max).toFixed(2);
-
-  return Object.entries(base).map(([key, info]) => {
-    const pct = parseFloat(randomChange(2.5));
-    const val = (info.base * (1 + pct/100)).toFixed(0);
-    return { key, name: info.name, value: Number(val).toLocaleString(), pct };
-  });
+async function apiFetch(endpoint) {
+  const r = await fetch(`${BASE}${endpoint}&token=${API_KEY}`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
 }
 
-function generateFearGreed() {
-  // Simulated; in production use CNN Fear & Greed API
-  const val = Math.floor(Math.random() * 100);
-  let label, color;
-  if (val < 25) { label = 'MIEDO EXTREMO'; color = 'var(--red)'; }
-  else if (val < 45) { label = 'MIEDO'; color = '#ff7043'; }
-  else if (val < 55) { label = 'NEUTRAL'; color = 'var(--yellow)'; }
-  else if (val < 75) { label = 'CODICIA'; color = '#69f0ae'; }
-  else { label = 'CODICIA EXTREMA'; color = 'var(--green)'; }
-  return { val, label, color };
-}
-
-function generateMovers() {
-  const stocks = [
-    { ticker: 'NVDA', name: 'NVIDIA Corp' },
-    { ticker: 'TSLA', name: 'Tesla Inc' },
-    { ticker: 'AAPL', name: 'Apple Inc' },
-    { ticker: 'MSFT', name: 'Microsoft' },
-    { ticker: 'AMZN', name: 'Amazon' },
-    { ticker: 'META', name: 'Meta Platforms' },
-    { ticker: 'SPY', name: 'S&P 500 ETF' },
-  ];
-
-  return stocks.slice(0, 5).map(s => {
-    const pct = (Math.random() * 8 - 3.5).toFixed(2);
-    return { ...s, pct: parseFloat(pct) };
-  }).sort((a,b) => Math.abs(b.pct) - Math.abs(a.pct));
-}
-
-function generateNews() {
-  const newsPool = [
-    { text: 'La Fed mantiene tasas de interés sin cambios; Powell señala posibles recortes en Q3', sentiment: 'bullish', time: 'Hace 12 min' },
-    { text: 'Inflación CPI de EE.UU. baja a 2.8% interanual, mejor de lo esperado por analistas', sentiment: 'bullish', time: 'Hace 28 min' },
-    { text: 'NVIDIA supera estimaciones de ganancias por tercer trimestre consecutivo; acción sube 4%', sentiment: 'bullish', time: 'Hace 45 min' },
-    { text: 'Tensiones comerciales entre EE.UU. y China presionan mercados de materias primas', sentiment: 'bearish', time: 'Hace 1 hr' },
-    { text: 'El VIX baja a 14.2 indicando menor volatilidad esperada para la sesión de hoy', sentiment: 'bullish', time: 'Hace 2 hr' },
-    { text: 'Rendimiento del bono a 10 años sube 4 puntos básicos presionando al sector tech', sentiment: 'bearish', time: 'Hace 3 hr' },
-    { text: 'Datos de empleo (NFP) superan expectativas: +250K empleos vs 180K esperados', sentiment: 'neutral', time: 'Hace 3 hr' },
-    { text: 'Goldman Sachs eleva objetivo del S&P 500 para fin de año a 5,800 puntos', sentiment: 'bullish', time: 'Hace 4 hr' },
-  ];
-
-  // Pick 5 random
-  return newsPool.sort(() => Math.random() - 0.5).slice(0, 5);
-}
-
-// =====================
-// RECOMMENDATION ENGINE
-// =====================
-function getRecommendation(indices, fg, movers) {
-  const avgPct = indices.reduce((s, i) => s + i.pct, 0) / indices.length;
-  const positiveMovers = movers.filter(m => m.pct > 0).length;
-
-  let score = 0;
-  if (avgPct > 0.5) score += 2;
-  else if (avgPct > 0) score += 1;
-  else if (avgPct < -0.5) score -= 2;
-  else score -= 1;
-
-  if (fg.val > 60) score += 1;
-  else if (fg.val < 30) score -= 1;
-
-  if (positiveMovers >= 4) score += 1;
-  else if (positiveMovers <= 1) score -= 1;
-
-  const { status } = getMarketStatus();
-
-  if (score >= 3) return {
-    type: 'buy',
-    badge: '✦ CONDICIONES FAVORABLES',
-    title: `Mercado Alcista — Buen Momento para Invertir`,
-    body: `Los índices muestran momentum positivo (S&P ${avgPct > 0 ? '+' : ''}${avgPct.toFixed(2)}% promedio) y el sentimiento del mercado es ${fg.label.toLowerCase()}. La mayoría de los sectores abren al alza. ${status !== 'open' ? 'El mercado aún no ha abierto — monitorea los futuros.' : 'El mercado está en plena operación.'}`,
-    factors: [
-      { label: `S&P ${avgPct > 0 ? '+' : ''}${avgPct.toFixed(2)}%`, type: 'pos' },
-      { label: `F&G: ${fg.val} (${fg.label})`, type: 'pos' },
-      { label: `${positiveMovers}/5 acciones al alza`, type: 'pos' },
-      { label: 'Volatilidad controlada', type: 'pos' },
-    ]
-  };
-
-  if (score <= -2) return {
-    type: 'avoid',
-    badge: '⚠ CONDICIONES DESFAVORABLES',
-    title: `Mercado Bajista — Considera Esperar`,
-    body: `Los índices presentan presión vendedora (S&P ${avgPct.toFixed(2)}% promedio) y el sentimiento refleja ${fg.label.toLowerCase()}. Se recomienda cautela: aguarda confirmación de reversión antes de abrir nuevas posiciones.`,
-    factors: [
-      { label: `S&P ${avgPct.toFixed(2)}%`, type: 'neg' },
-      { label: `F&G: ${fg.val} (${fg.label})`, type: 'neg' },
-      { label: `${5 - positiveMovers}/5 acciones a la baja`, type: 'neg' },
-      { label: 'Alta volatilidad', type: 'neg' },
-    ]
-  };
-
-  return {
-    type: 'neutral',
-    badge: '◈ MERCADO MIXTO',
-    title: `Señales Mixtas — Operar con Selectividad`,
-    body: `El mercado no muestra una dirección clara. El S&P promedia ${avgPct > 0 ? '+' : ''}${avgPct.toFixed(2)}% con sentimiento ${fg.label.toLowerCase()}. Se recomienda enfocarse en activos con catalizadores propios antes de tomar posiciones generales.`,
-    factors: [
-      { label: `S&P ${avgPct > 0 ? '+' : ''}${avgPct.toFixed(2)}%`, type: avgPct > 0 ? 'pos' : 'neg' },
-      { label: `F&G: ${fg.val}`, type: 'neutral' },
-      { label: `${positiveMovers}/5 al alza`, type: 'neutral' },
-      { label: 'Selectividad recomendada', type: 'neutral' },
-    ]
-  };
-}
-
-// =====================
-// RENDER FUNCTIONS
-// =====================
-function renderIndices(data) {
-  const grid = document.getElementById('indicesGrid');
-  grid.innerHTML = data.map((d, i) => `
-    <div class="index-card" style="animation-delay:${0.15 + i * 0.05}s">
-      <div class="index-name">${d.name}</div>
-      <div class="index-value">${d.value}</div>
-      <div class="index-change ${d.pct >= 0 ? 'up' : 'down'}">
-        ${d.pct >= 0 ? '▲' : '▼'} ${Math.abs(d.pct).toFixed(2)}%
-      </div>
-      <svg class="sparkline" viewBox="0 0 100 32">
-        <polyline fill="none" stroke="${d.pct >= 0 ? 'var(--green)' : 'var(--red)'}" stroke-width="1.5"
-          points="${generateSparkPoints(d.pct)}"/>
-      </svg>
-    </div>
-  `).join('');
-}
-
-function generateSparkPoints(trend) {
-  let pts = [];
-  let y = 16;
-  for (let x = 0; x <= 100; x += 10) {
-    y += (Math.random() - 0.5) * 8 + (trend > 0 ? -0.5 : 0.5);
-    y = Math.max(4, Math.min(28, y));
+function genSpark(trend) {
+  let pts=[], y=16;
+  for (let x=0;x<=100;x+=10) {
+    y += (Math.random()-.5)*6 + (trend>0?-.4:.4);
+    y = Math.max(4,Math.min(28,y));
     pts.push(`${x},${y}`);
   }
   return pts.join(' ');
 }
 
-function renderFG(fg) {
-  document.getElementById('fgValue').textContent = fg.val;
-  document.getElementById('fgValue').style.color = fg.color;
-  document.getElementById('fgLabel').textContent = fg.label;
-
-  // Gauge arc animation
-  const total = 188;
-  const fill = (fg.val / 100) * total;
-  const gaugeEl = document.getElementById('gaugeFill');
-  gaugeEl.style.stroke = fg.color;
-  gaugeEl.setAttribute('stroke-dasharray', `${fill} ${total}`);
-
-  // Needle
-  const angle = (fg.val / 100) * 180 - 90;
-  document.getElementById('gaugeNeedle').setAttribute('transform', `rotate(${angle}, 70, 75)`);
-  document.getElementById('gaugeNeedle').style.stroke = fg.color;
-  document.querySelector('circle[cx="70"]').style.fill = fg.color;
+async function loadIndices() {
+  const syms = [{symbol:'SPY',name:'S&P 500'},{symbol:'QQQ',name:'NASDAQ'},{symbol:'DIA',name:'DOW JONES'}];
+  const results = await Promise.all(syms.map(async s => {
+    try {
+      const q = await apiFetch(`/quote?symbol=${s.symbol}`);
+      return {...s, value: q.c.toFixed(2), pct: q.dp||0, change: q.d||0};
+    } catch { return {...s, value:'N/A', pct:0, change:0}; }
+  }));
+  document.getElementById('indicesGrid').innerHTML = results.map((d,i) => `
+    <div class="index-card" style="animation-delay:${.15+i*.05}s">
+      <div class="index-name">${d.name}</div>
+      <div class="index-value">$${d.value}</div>
+      <div class="index-change ${d.pct>=0?'up':'down'}">
+        ${d.pct>=0?'▲':'▼'} ${Math.abs(d.pct).toFixed(2)}%
+        <span style="font-size:10px;font-weight:400;margin-left:4px">(${d.change>=0?'+':''}${Number(d.change).toFixed(2)})</span>
+      </div>
+      <svg class="sparkline" viewBox="0 0 100 32">
+        <polyline fill="none" stroke="${d.pct>=0?'var(--green)':'var(--red)'}" stroke-width="1.5" points="${genSpark(d.pct)}"/>
+      </svg>
+    </div>`).join('');
+  return results;
 }
 
-function renderMovers(movers) {
-  document.getElementById('moversContainer').innerHTML = movers.map(m => `
+async function loadMovers() {
+  const watchlist = [
+    {symbol:'NVDA',name:'NVIDIA'},{symbol:'AAPL',name:'Apple'},{symbol:'TSLA',name:'Tesla'},
+    {symbol:'MSFT',name:'Microsoft'},{symbol:'META',name:'Meta'},{symbol:'AMZN',name:'Amazon'},{symbol:'GOOGL',name:'Alphabet'}
+  ];
+  const results = await Promise.all(watchlist.map(async s => {
+    try {
+      const q = await apiFetch(`/quote?symbol=${s.symbol}`);
+      return {...s, pct: q.dp||0, price: q.c||0};
+    } catch { return {...s, pct:0, price:0}; }
+  }));
+  const sorted = results.sort((a,b)=>Math.abs(b.pct)-Math.abs(a.pct)).slice(0,5);
+  document.getElementById('moversContainer').innerHTML = sorted.map(m=>`
     <div class="mover-row">
       <div>
-        <div class="mover-ticker">${m.ticker}</div>
-        <div class="mover-name">${m.name}</div>
+        <div class="mover-ticker">${m.symbol}</div>
+        <div class="mover-name">${m.name} · $${m.price.toFixed(2)}</div>
       </div>
-      <div class="index-change ${m.pct >= 0 ? 'up' : 'down'}">
-        ${m.pct >= 0 ? '▲' : '▼'} ${Math.abs(m.pct).toFixed(2)}%
+      <div class="index-change ${m.pct>=0?'up':'down'}">
+        ${m.pct>=0?'▲':'▼'} ${Math.abs(m.pct).toFixed(2)}%
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
+  return sorted;
 }
 
-function renderRec(rec) {
-  const badge = document.getElementById('recBadge');
-  badge.textContent = rec.badge;
-  badge.className = `rec-badge ${rec.type === 'buy' ? '' : rec.type === 'avoid' ? 'avoid' : 'neutral'}`;
-  document.getElementById('recTitle').textContent = rec.title;
-  document.getElementById('recBody').textContent = rec.body;
-  document.getElementById('recFactors').innerHTML = rec.factors.map(f =>
-    `<span class="factor ${f.type}">${f.label}</span>`
-  ).join('');
+async function loadSentiment() {
+  // Use SPY + QQQ momentum as sentiment proxy since free tier doesn't have VIX
+  let val = 50;
+  try {
+    const [spy, qqq] = await Promise.all([
+      apiFetch('/quote?symbol=SPY'),
+      apiFetch('/quote?symbol=QQQ')
+    ]);
+    const avg = ((spy.dp||0) + (qqq.dp||0)) / 2;
+    if (avg > 1.5) val = 82;
+    else if (avg > 0.8) val = 68;
+    else if (avg > 0.2) val = 58;
+    else if (avg > -0.2) val = 48;
+    else if (avg > -0.8) val = 35;
+    else if (avg > -1.5) val = 22;
+    else val = 12;
+  } catch { val = 50; }
+
+  let label, color;
+  if (val<25){label='MIEDO EXTREMO';color='var(--red)'}
+  else if (val<45){label='MIEDO';color='#ff7043'}
+  else if (val<55){label='NEUTRAL';color='var(--yellow)'}
+  else if (val<75){label='CODICIA';color='#69f0ae'}
+  else{label='CODICIA EXTREMA';color='var(--green)'}
+
+  document.getElementById('fgValue').textContent = val;
+  document.getElementById('fgValue').style.color = color;
+  document.getElementById('fgLabel').textContent = label;
+  const total=188, fill=(val/100)*total;
+  const g = document.getElementById('gaugeFill');
+  g.style.stroke = color; g.setAttribute('stroke-dasharray',`${fill} ${total}`);
+  const angle = (val/100)*180 - 90;
+  document.getElementById('gaugeNeedle').setAttribute('transform',`rotate(${angle},70,75)`);
+  document.getElementById('gaugeNeedle').style.stroke = color;
+  document.querySelector('circle[cx="70"]').style.fill = color;
+  return {val, label};
 }
 
-function renderNews(news) {
-  document.getElementById('newsContainer').innerHTML = news.map(n => `
-    <div class="news-item">
-      <div class="news-dot ${n.sentiment}"></div>
-      <div>
-        <div class="news-text">${n.text}</div>
-        <div class="news-meta">${n.time} · ${n.sentiment === 'bullish' ? '↑ Alcista' : n.sentiment === 'bearish' ? '↓ Bajista' : '→ Neutral'}</div>
-      </div>
-    </div>
-  `).join('');
+async function loadNews() {
+  try {
+    const news = await apiFetch('/news?category=general&minId=0');
+    const items = (news||[]).slice(0,6);
+    if (!items.length) throw new Error('no news');
+    document.getElementById('newsContainer').innerHTML = items.map(n => {
+      const title = n.headline || 'Sin título';
+      const src = n.source || 'Finnhub';
+      const ts = n.datetime ? new Date(n.datetime*1000).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}) : '--';
+      const lower = title.toLowerCase();
+      const bull = ['rise','gain','up','surge','beat','record','growth','rally','strong','bullish','profit'].some(w=>lower.includes(w));
+      const bear = ['fall','drop','down','crash','loss','risk','fear','bearish','decline','weak','sell'].some(w=>lower.includes(w));
+      const sent = bull?'bullish':bear?'bearish':'neutral';
+      const sentLabel = bull?'↑ Alcista':bear?'↓ Bajista':'→ Neutral';
+      return `<a class="news-item" href="${n.url||'#'}" target="_blank" rel="noopener">
+        <div class="news-dot ${sent}"></div>
+        <div>
+          <div class="news-text">${title.slice(0,120)}${title.length>120?'...':''}</div>
+          <div class="news-meta">${ts} · ${src} · ${sentLabel}</div>
+        </div>
+      </a>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('newsContainer').innerHTML = `<div class="error-msg">Error cargando noticias.</div>`;
+  }
 }
 
-// =====================
-// MAIN LOAD
-// =====================
-function loadData() {
-  const indices = generateMarketData();
-  const fg = generateFearGreed();
-  const movers = generateMovers();
-  const news = generateNews();
-  const rec = getRecommendation(indices, fg, movers);
+function buildRecommendation(indices, movers, fg) {
+  const avgPct = indices.reduce((s,i)=>s+(i.pct||0),0)/indices.length;
+  const posMovers = movers.filter(m=>m.pct>0).length;
+  const {status} = getMarketStatus();
+  let score = 0;
+  if (avgPct>0.8) score+=2; else if (avgPct>0.2) score+=1;
+  else if (avgPct<-0.8) score-=2; else if (avgPct<-0.2) score-=1;
+  if (fg.val>65) score+=1; else if (fg.val<35) score-=1;
+  if (posMovers>=4) score+=1; else if (posMovers<=1) score-=1;
+  const note = status!=='open' ? ` ⚠️ El mercado ${status==='pre'?'aún no ha abierto (pre-market)':status==='after'?'ya cerró (after-hours)':'está cerrado'}.` : '';
 
+  if (score>=3) {
+    document.getElementById('recBadge').textContent='✦ CONDICIONES FAVORABLES';
+    document.getElementById('recBadge').className='rec-badge';
+    document.getElementById('recTitle').textContent='Mercado Alcista — Buen Momento para Invertir';
+    document.getElementById('recBody').textContent=`Los índices muestran momentum positivo (promedio ${avgPct>0?'+':''}${avgPct.toFixed(2)}%) y el sentimiento es ${fg.label}. La mayoría de acciones clave operan al alza.${note}`;
+  } else if (score<=-2) {
+    document.getElementById('recBadge').textContent='⚠ CONDICIONES DESFAVORABLES';
+    document.getElementById('recBadge').className='rec-badge avoid';
+    document.getElementById('recTitle').textContent='Mercado Bajista — Considera Esperar';
+    document.getElementById('recBody').textContent=`Los índices presentan presión vendedora (promedio ${avgPct.toFixed(2)}%) con sentimiento de ${fg.label}. Cautela recomendada.${note}`;
+  } else {
+    document.getElementById('recBadge').textContent='◈ MERCADO MIXTO';
+    document.getElementById('recBadge').className='rec-badge neutral';
+    document.getElementById('recTitle').textContent='Señales Mixtas — Opera con Selectividad';
+    document.getElementById('recBody').textContent=`El mercado no muestra dirección clara. Promedio: ${avgPct>0?'+':''}${avgPct.toFixed(2)}%, sentimiento ${fg.label}. Enfócate en activos con catalizadores propios.${note}`;
+  }
+
+  document.getElementById('recFactors').innerHTML = [
+    {label:`S&P ${avgPct>0?'+':''}${avgPct.toFixed(2)}%`,type:avgPct>0?'pos':'neg'},
+    {label:`Sentimiento: ${fg.val} · ${fg.label}`,type:fg.val>55?'pos':fg.val<40?'neg':''},
+    {label:`${posMovers}/7 acciones ↑`,type:posMovers>=4?'pos':'neg'},
+    {label:status==='open'?'✓ Mercado ABIERTO':'✗ Mercado CERRADO',type:status==='open'?'pos':'neg'},
+  ].map(f=>`<span class="factor ${f.type}">${f.label}</span>`).join('');
+}
+
+async function loadAll() {
   renderMarketStatus();
-  renderIndices(indices);
-  renderFG(fg);
-  renderMovers(movers);
-  renderRec(rec);
-  renderNews(news);
+  try {
+    const [indices, movers, fg] = await Promise.all([loadIndices(), loadMovers(), loadSentiment()]);
+    buildRecommendation(indices, movers, fg);
+    loadNews();
+  } catch(e) { console.error(e); }
+  document.getElementById('lastUpdate').textContent = `Última actualización: ${new Date().toLocaleTimeString('es')}`;
 }
 
-// INIT
 window.addEventListener('load', () => {
   setTimeout(() => {
-    loadData();
     const loader = document.getElementById('loader');
     loader.style.opacity = '0';
-    setTimeout(() => loader.style.display = 'none', 400);
-  }, 1900);
+    setTimeout(() => loader.style.display='none', 400);
+    loadAll();
+  }, 2000);
 });
 
-// Auto-refresh each 5 minutes
-setInterval(() => {
-  renderMarketStatus();
-  loadData();
-}, 5 * 60 * 1000);
+setInterval(loadAll, 5*60*1000);
 </script>
 </body>
 </html>

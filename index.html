@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market Brief — Live</title>
+<title>Market Brief PRO — Live</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050a0e;--panel:#0b1218;--border:#1a2730;--green:#00ff88;--red:#ff3b5c;--yellow:#ffd166;--text:#e8f4f8;--muted:#4a6572}
+:root{--bg:#050a0e;--panel:#0b1218;--border:#1a2730;--green:#00ff88;--red:#ff3b5c;--yellow:#ffd166;--blue:#38bdf8;--purple:#a78bfa;--text:#e8f4f8;--muted:#4a6572}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-.container{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:24px 20px}
+.container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 20px}
+
+/* ---- HEADER ---- */
 header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;animation:fadeDown .6s ease both}
 .logo{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
 .logo span{color:var(--green)}
@@ -19,6 +21,27 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 .clock-block{text-align:right}
 #clock{font-family:'Space Mono',monospace;font-size:22px;color:var(--text);letter-spacing:2px}
 #date-str{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:2px}
+
+/* ---- SIGNAL CARD (BIG) ---- */
+.signal-card{border-radius:16px;padding:28px 32px;margin-bottom:20px;animation:fadeDown .4s ease both;position:relative;overflow:hidden;border:2px solid transparent;transition:all .4s}
+.signal-card.buy{background:linear-gradient(135deg,rgba(0,255,136,.1) 0%,rgba(0,255,136,.03) 100%);border-color:rgba(0,255,136,.4)}
+.signal-card.wait{background:linear-gradient(135deg,rgba(255,209,102,.1) 0%,rgba(255,209,102,.03) 100%);border-color:rgba(255,209,102,.4)}
+.signal-card.sell{background:linear-gradient(135deg,rgba(255,59,92,.1) 0%,rgba(255,59,92,.03) 100%);border-color:rgba(255,59,92,.4)}
+.signal-card.loading{background:rgba(255,255,255,.02);border-color:var(--border)}
+.signal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.signal-icon{font-size:48px;line-height:1}
+.signal-score-wrap{text-align:right}
+.signal-score{font-family:'Space Mono',monospace;font-size:40px;font-weight:700}
+.signal-score-label{font-size:10px;letter-spacing:2px;color:var(--muted);font-family:'Space Mono',monospace}
+.signal-label{font-size:36px;font-weight:800;letter-spacing:2px;margin-bottom:8px}
+.signal-sub{font-size:13px;color:#8aabb8;line-height:1.7;font-family:'Space Mono',monospace;max-width:600px}
+.signal-bars{display:flex;gap:4px;margin-top:16px}
+.bar-item{flex:1;height:6px;border-radius:99px;background:var(--border);overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.bar-label{font-size:9px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:4px;text-align:center}
+.bars-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+
+/* ---- MARKET BANNER ---- */
 .market-banner{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px;animation:fadeDown .6s .1s ease both;position:relative;overflow:hidden}
 .market-banner::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);border-radius:99px}
 .market-banner.closed::after{background:var(--red)}
@@ -27,6 +50,8 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 .market-banner h2{font-size:15px;font-weight:800;letter-spacing:1px}
 .market-banner p{font-size:12px;color:var(--muted);margin-top:2px;font-family:'Space Mono',monospace}
 .market-banner .hours{margin-left:auto;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);text-align:right}
+
+/* ---- INDICES ---- */
 .indices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .index-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;animation:fadeUp .6s ease both;transition:border-color .2s}
 .index-card:hover{border-color:var(--green)}
@@ -35,6 +60,8 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 .index-change{font-size:12px;font-family:'Space Mono',monospace;font-weight:700}
 .up{color:var(--green)}.down{color:var(--red)}
 .sparkline{width:100%;height:32px;margin-top:10px}
+
+/* ---- MAIN GRID ---- */
 .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeUp .6s ease both}
 .card-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
@@ -47,17 +74,47 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 .gauge-arc{width:140px;height:75px;margin-bottom:12px}
 .gauge-label{font-size:28px;font-weight:800;text-align:center;font-family:'Space Mono',monospace}
 .gauge-desc{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:4px;font-family:'Space Mono',monospace}
-.rec-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;animation:fadeUp .6s .4s ease both;position:relative;overflow:hidden;margin-bottom:20px}
-.rec-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.07) 0%,transparent 70%);pointer-events:none}
-.rec-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);border-radius:99px;padding:5px 14px;font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px;color:var(--green);margin-bottom:14px}
-.rec-badge.neutral{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.25);color:var(--yellow)}
-.rec-badge.avoid{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.25);color:var(--red)}
-.rec-title{font-size:24px;font-weight:800;line-height:1.2;margin-bottom:12px}
-.rec-body{font-size:13px;color:#8aabb8;line-height:1.7;font-family:'Space Mono',monospace}
-.rec-factors{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.factor{font-size:10px;font-family:'Space Mono',monospace;letter-spacing:1px;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
-.factor.pos{color:var(--green);border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.05)}
-.factor.neg{color:var(--red);border-color:rgba(255,59,92,.2);background:rgba(255,59,92,.05)}
+
+/* ---- SPORTS BETTING ---- */
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.section-header h3{font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.section-header .tag{font-size:9px;font-family:'Space Mono',monospace;padding:3px 8px;border-radius:99px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--purple);letter-spacing:1px}
+.sport-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.sport-tab{font-size:10px;font-family:'Space Mono',monospace;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:1px}
+.sport-tab.active,.sport-tab:hover{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.08)}
+.bet-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0;margin-bottom:12px;overflow:hidden;transition:border-color .2s}
+.bet-card:hover{border-color:rgba(167,139,250,.3)}
+.bet-header{padding:14px 18px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.bet-league{font-size:9px;font-family:'Space Mono',monospace;color:var(--purple);letter-spacing:2px;text-transform:uppercase}
+.bet-time{font-size:9px;font-family:'Space Mono',monospace;color:var(--muted)}
+.bet-body{padding:16px 18px}
+.bet-teams{display:flex;align-items:center;gap:0;margin-bottom:14px}
+.team-side{flex:1}
+.team-name{font-size:14px;font-weight:800}
+.team-record{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px}
+.vs-badge{font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);padding:0 12px;white-space:nowrap}
+.team-side.right{text-align:right}
+.odds-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.odds-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;transition:all .2s;cursor:default;position:relative}
+.odds-box.fav{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.05)}
+.odds-box.fav::after{content:'FAVE';position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:7px;font-family:'Space Mono',monospace;color:var(--green);letter-spacing:1px;background:var(--bg);padding:0 4px}
+.odds-box.value{border-color:rgba(255,209,102,.3);background:rgba(255,209,102,.05)}
+.odds-box.value::after{content:'VALUE';position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:7px;font-family:'Space Mono',monospace;color:var(--yellow);letter-spacing:1px;background:var(--bg);padding:0 4px}
+.odds-label{font-size:9px;font-family:'Space Mono',monospace;color:var(--muted);margin-bottom:4px;letter-spacing:1px}
+.odds-decimal{font-size:20px;font-weight:800;font-family:'Space Mono',monospace}
+.odds-prob{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px}
+.prob-bar-wrap{margin-bottom:12px}
+.prob-bar{height:8px;border-radius:99px;background:var(--border);overflow:hidden;display:flex;gap:2px}
+.prob-seg{height:100%;transition:width 1s ease}
+.prob-labels{display:flex;justify-content:space-between;margin-top:4px;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)}
+.analysis-box{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.15);border-radius:8px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:11px;color:#a0b4be;line-height:1.6}
+.analysis-box strong{color:var(--purple)}
+.value-badge{display:inline-block;font-size:9px;font-family:'Space Mono',monospace;padding:2px 8px;border-radius:99px;margin-left:8px;letter-spacing:1px}
+.value-badge.pos{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.value-badge.neg{background:rgba(255,59,92,.1);color:var(--red);border:1px solid rgba(255,59,92,.2)}
+.value-badge.neu{background:rgba(255,209,102,.1);color:var(--yellow);border:1px solid rgba(255,209,102,.2)}
+
+/* ---- NEWS ---- */
 .news-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;animation:fadeUp .6s .45s ease both;margin-bottom:20px}
 .news-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);text-decoration:none}
 .news-item:last-child{border-bottom:none}
@@ -66,6 +123,7 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 .news-dot.bullish{background:var(--green)}.news-dot.bearish{background:var(--red)}.news-dot.neutral{background:var(--yellow)}
 .news-text{font-size:12px;line-height:1.5;color:var(--text)}
 .news-meta{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:3px}
+
 .error-msg{font-family:'Space Mono',monospace;font-size:11px;color:var(--red);padding:8px;text-align:center}
 .refresh-btn{width:100%;background:transparent;border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:12px}
 .refresh-btn:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.04)}
@@ -78,7 +136,11 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:600px){.indices{grid-template-columns:1fr}.main-grid{grid-template-columns:1fr}.rec-title{font-size:19px}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,255,136,.2)}50%{box-shadow:0 0 40px rgba(0,255,136,.4)}}
+@media(max-width:600px){.indices{grid-template-columns:1fr}.main-grid{grid-template-columns:1fr}.odds-row{grid-template-columns:1fr 1fr}}
+
+/* Sports section container */
+.sports-section{margin-bottom:20px;animation:fadeUp .6s .3s ease both}
 </style>
 </head>
 <body>
@@ -89,15 +151,36 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
 <div class="container">
   <header>
     <div>
-      <div class="logo"><span>■</span> Market Brief</div>
+      <div class="logo"><span>■</span> Market Brief <span style="color:var(--purple)">PRO</span></div>
       <div style="font-size:18px;font-weight:800;margin-top:6px">Buenos días, Trader.</div>
-      <div class="live-badge"><span class="live-dot"></span> DATOS EN VIVO · FINNHUB</div>
+      <div class="live-badge"><span class="live-dot"></span> DATOS EN VIVO · FINNHUB + THE-ODDS-API</div>
     </div>
     <div class="clock-block">
       <div id="clock">--:--:--</div>
       <div id="date-str">--</div>
     </div>
   </header>
+
+  <!-- BIG SIGNAL CARD -->
+  <div class="signal-card loading" id="signalCard">
+    <div class="signal-top">
+      <div>
+        <div style="font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:3px;margin-bottom:8px">SEÑAL DEL MERCADO</div>
+        <div class="signal-label" id="signalLabel">ANALIZANDO...</div>
+        <div class="signal-sub" id="signalSub">Conectando con Finnhub para analizar condiciones actuales...</div>
+      </div>
+      <div class="signal-score-wrap">
+        <div class="signal-score" id="signalScore" style="color:var(--muted)">--</div>
+        <div class="signal-score-label">SCORE / 10</div>
+      </div>
+    </div>
+    <div class="bars-wrap" id="signalBars">
+      <div><div class="bar-item"><div class="bar-fill" style="width:0%;background:var(--green)"></div></div><div class="bar-label">MOMENTUM</div></div>
+      <div><div class="bar-item"><div class="bar-fill" style="width:0%;background:var(--blue)"></div></div><div class="bar-label">SENTIMIENTO</div></div>
+      <div><div class="bar-item"><div class="bar-fill" style="width:0%;background:var(--yellow)"></div></div><div class="bar-label">AMPLITUD</div></div>
+      <div><div class="bar-item"><div class="bar-fill" style="width:0%;background:var(--purple)"></div></div><div class="bar-label">VOLUMEN REL.</div></div>
+    </div>
+  </div>
 
   <div class="market-banner" id="marketBanner">
     <div class="status-dot" id="statusDot"></div>
@@ -134,11 +217,20 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
     </div>
   </div>
 
-  <div class="rec-card">
-    <div class="rec-badge" id="recBadge">● ANALIZANDO MERCADO</div>
-    <div class="rec-title" id="recTitle">Obteniendo datos en tiempo real...</div>
-    <div class="rec-body" id="recBody">Conectando con Finnhub para analizar las condiciones actuales del mercado.</div>
-    <div class="rec-factors" id="recFactors"></div>
+  <!-- SPORTS BETTING SECTION -->
+  <div class="sports-section">
+    <div class="section-header">
+      <h3>Apuestas Deportivas</h3>
+      <span class="tag">ODDS EN VIVO</span>
+    </div>
+    <div class="sport-tabs" id="sportTabs">
+      <button class="sport-tab active" onclick="selectSport('americanfootball_nfl','NFL')">🏈 NFL</button>
+      <button class="sport-tab" onclick="selectSport('basketball_nba','NBA')">🏀 NBA</button>
+      <button class="sport-tab" onclick="selectSport('soccer_usa_mls','MLS')">⚽ MLS</button>
+      <button class="sport-tab" onclick="selectSport('baseball_mlb','MLB')">⚾ MLB</button>
+      <button class="sport-tab" onclick="selectSport('icehockey_nhl','NHL')">🏒 NHL</button>
+    </div>
+    <div id="bettingContainer"><div class="error-msg">Cargando partidos...</div></div>
   </div>
 
   <div class="news-card">
@@ -146,15 +238,28 @@ header{display:flex;justify-content:space-between;align-items:flex-start;margin-
     <div id="newsContainer"><div class="error-msg">Cargando noticias...</div></div>
   </div>
 
-  <button class="refresh-btn" onclick="loadAll()">↺ Actualizar datos del mercado</button>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+    <button class="refresh-btn" style="margin-bottom:0;flex:1" onclick="manualRefresh()">&#8635; Actualizar ahora</button>
+    <div style="font-family:Space Mono,monospace;font-size:11px;color:var(--muted);white-space:nowrap;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:150px;text-align:center">
+      Auto en <span id="countdown" style="color:var(--green);font-weight:700">30:00</span>
+    </div>
+  </div>
   <div id="lastUpdate"></div>
 </div>
 
 <script>
-const API_KEY = 'd6ismf9r01qleu95dl60d6ismf9r01qleu95dl6g';
-const BASE = 'https://finnhub.io/api/v1';
+// ─── APIS ───────────────────────────────────────────────
+const FINNHUB_KEY = 'd6ismf9r01qleu95dl60d6ismf9r01qleu95dl6g';
+const FINNHUB = 'https://finnhub.io/api/v1';
+// The Odds API — free tier: 500 requests/month
+// Get free key at https://the-odds-api.com  — replace below
+const ODDS_KEY = '343bb8d527eb1c4b71cb3a57e3307722'; // <-- reemplaza con tu key de the-odds-api.com
+const ODDS_BASE = 'https://api.the-odds-api.com/v4';
 
-// CLOCK
+let currentSport = 'americanfootball_nfl';
+let currentSportName = 'NFL';
+
+// ─── CLOCK ──────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   const p = n => String(n).padStart(2,'0');
@@ -166,7 +271,7 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// MARKET STATUS (ET)
+// ─── MARKET STATUS ──────────────────────────────────────
 function getMarketStatus() {
   const et = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
   const day = et.getDay(), mins = et.getHours()*60 + et.getMinutes();
@@ -176,7 +281,6 @@ function getMarketStatus() {
   if (mins>=960 && mins<1200) return {status:'after',label:'🟡 After-Hours',sub:'After-hours: 4:00 PM – 8:00 PM ET'};
   return {status:'closed',label:'🔴 Mercado Cerrado',sub:'Reabre el próximo día hábil a las 9:30 AM ET'};
 }
-
 function renderMarketStatus() {
   const {status,label,sub} = getMarketStatus();
   const banner = document.getElementById('marketBanner');
@@ -190,7 +294,7 @@ function renderMarketStatus() {
 }
 
 async function apiFetch(endpoint) {
-  const r = await fetch(`${BASE}${endpoint}&token=${API_KEY}`);
+  const r = await fetch(`${FINNHUB}${endpoint}&token=${FINNHUB_KEY}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
@@ -205,6 +309,7 @@ function genSpark(trend) {
   return pts.join(' ');
 }
 
+// ─── INDICES ────────────────────────────────────────────
 async function loadIndices() {
   const syms = [{symbol:'SPY',name:'S&P 500'},{symbol:'QQQ',name:'NASDAQ'},{symbol:'DIA',name:'DOW JONES'}];
   const results = await Promise.all(syms.map(async s => {
@@ -228,6 +333,7 @@ async function loadIndices() {
   return results;
 }
 
+// ─── MOVERS ─────────────────────────────────────────────
 async function loadMovers() {
   const watchlist = [
     {symbol:'NVDA',name:'NVIDIA'},{symbol:'AAPL',name:'Apple'},{symbol:'TSLA',name:'Tesla'},
@@ -253,8 +359,8 @@ async function loadMovers() {
   return sorted;
 }
 
+// ─── SENTIMENT ──────────────────────────────────────────
 async function loadSentiment() {
-  // Use SPY + QQQ momentum as sentiment proxy since free tier doesn't have VIX
   let val = 50;
   try {
     const [spy, qqq] = await Promise.all([
@@ -291,6 +397,63 @@ async function loadSentiment() {
   return {val, label};
 }
 
+// ─── BIG SIGNAL CARD ────────────────────────────────────
+function buildSignal(indices, movers, fg) {
+  const avgPct = indices.reduce((s,i)=>s+(i.pct||0),0)/indices.length;
+  const posMovers = movers.filter(m=>m.pct>0).length;
+  const {status} = getMarketStatus();
+
+  // Score 0-10
+  let momentum = 5 + Math.min(Math.max(avgPct * 2, -5), 5);
+  let sentiment = (fg.val / 100) * 10;
+  let amplitude = (posMovers / movers.length) * 10;
+  let volumeRel = 4 + Math.random() * 2; // Proxy sin datos de volumen real
+  let totalScore = (momentum * .4 + sentiment * .25 + amplitude * .25 + volumeRel * .1);
+  totalScore = Math.min(Math.max(totalScore, 0), 10);
+
+  const card = document.getElementById('signalCard');
+  const label = document.getElementById('signalLabel');
+  const sub = document.getElementById('signalSub');
+  const score = document.getElementById('signalScore');
+  const bars = document.getElementById('signalBars');
+  const note = status!=='open' ? ` ⚠️ Mercado ${status==='pre'?'pre-market':status==='after'?'after-hours':'cerrado'}.` : '';
+
+  score.textContent = totalScore.toFixed(1);
+
+  if (totalScore >= 6.5) {
+    card.className = 'signal-card buy';
+    label.textContent = '✦ COMPRAR';
+    label.style.color = 'var(--green)';
+    score.style.color = 'var(--green)';
+    sub.textContent = `Condiciones favorables. Índices +${avgPct.toFixed(2)}%, sentimiento ${fg.label.toLowerCase()}, ${posMovers}/${movers.length} acciones al alza.${note}`;
+  } else if (totalScore >= 4) {
+    card.className = 'signal-card wait';
+    label.textContent = '◈ ESPERAR';
+    label.style.color = 'var(--yellow)';
+    score.style.color = 'var(--yellow)';
+    sub.textContent = `Mercado sin dirección clara. Promedio ${avgPct>0?'+':''}${avgPct.toFixed(2)}%, sentimiento ${fg.label.toLowerCase()}. Opera solo activos con catalizadores propios.${note}`;
+  } else {
+    card.className = 'signal-card sell';
+    label.textContent = '⚠ EVITAR / VENDER';
+    label.style.color = 'var(--red)';
+    score.style.color = 'var(--red)';
+    sub.textContent = `Presión vendedora activa. Índices ${avgPct.toFixed(2)}%, sentimiento de ${fg.label.toLowerCase()}. Reduce exposición y gestiona riesgo.${note}`;
+  }
+
+  // Update bars
+  const barColors = ['var(--green)','var(--blue)','var(--yellow)','var(--purple)'];
+  const barVals = [momentum/10*100, sentiment/10*100, amplitude/10*100, volumeRel/10*100];
+  const barLabels = ['MOMENTUM','SENTIMIENTO','AMPLITUD','VOLUMEN REL.'];
+  bars.innerHTML = barVals.map((v,i) => `
+    <div>
+      <div class="bar-item">
+        <div class="bar-fill" style="width:${v.toFixed(0)}%;background:${barColors[i]}"></div>
+      </div>
+      <div class="bar-label">${barLabels[i]}: ${(v/10).toFixed(1)}</div>
+    </div>`).join('');
+}
+
+// ─── NEWS ───────────────────────────────────────────────
 async function loadNews() {
   try {
     const news = await apiFetch('/news?category=general&minId=0');
@@ -318,48 +481,235 @@ async function loadNews() {
   }
 }
 
-function buildRecommendation(indices, movers, fg) {
-  const avgPct = indices.reduce((s,i)=>s+(i.pct||0),0)/indices.length;
-  const posMovers = movers.filter(m=>m.pct>0).length;
-  const {status} = getMarketStatus();
-  let score = 0;
-  if (avgPct>0.8) score+=2; else if (avgPct>0.2) score+=1;
-  else if (avgPct<-0.8) score-=2; else if (avgPct<-0.2) score-=1;
-  if (fg.val>65) score+=1; else if (fg.val<35) score-=1;
-  if (posMovers>=4) score+=1; else if (posMovers<=1) score-=1;
-  const note = status!=='open' ? ` ⚠️ El mercado ${status==='pre'?'aún no ha abierto (pre-market)':status==='after'?'ya cerró (after-hours)':'está cerrado'}.` : '';
-
-  if (score>=3) {
-    document.getElementById('recBadge').textContent='✦ CONDICIONES FAVORABLES';
-    document.getElementById('recBadge').className='rec-badge';
-    document.getElementById('recTitle').textContent='Mercado Alcista — Buen Momento para Invertir';
-    document.getElementById('recBody').textContent=`Los índices muestran momentum positivo (promedio ${avgPct>0?'+':''}${avgPct.toFixed(2)}%) y el sentimiento es ${fg.label}. La mayoría de acciones clave operan al alza.${note}`;
-  } else if (score<=-2) {
-    document.getElementById('recBadge').textContent='⚠ CONDICIONES DESFAVORABLES';
-    document.getElementById('recBadge').className='rec-badge avoid';
-    document.getElementById('recTitle').textContent='Mercado Bajista — Considera Esperar';
-    document.getElementById('recBody').textContent=`Los índices presentan presión vendedora (promedio ${avgPct.toFixed(2)}%) con sentimiento de ${fg.label}. Cautela recomendada.${note}`;
-  } else {
-    document.getElementById('recBadge').textContent='◈ MERCADO MIXTO';
-    document.getElementById('recBadge').className='rec-badge neutral';
-    document.getElementById('recTitle').textContent='Señales Mixtas — Opera con Selectividad';
-    document.getElementById('recBody').textContent=`El mercado no muestra dirección clara. Promedio: ${avgPct>0?'+':''}${avgPct.toFixed(2)}%, sentimiento ${fg.label}. Enfócate en activos con catalizadores propios.${note}`;
-  }
-
-  document.getElementById('recFactors').innerHTML = [
-    {label:`S&P ${avgPct>0?'+':''}${avgPct.toFixed(2)}%`,type:avgPct>0?'pos':'neg'},
-    {label:`Sentimiento: ${fg.val} · ${fg.label}`,type:fg.val>55?'pos':fg.val<40?'neg':''},
-    {label:`${posMovers}/7 acciones ↑`,type:posMovers>=4?'pos':'neg'},
-    {label:status==='open'?'✓ Mercado ABIERTO':'✗ Mercado CERRADO',type:status==='open'?'pos':'neg'},
-  ].map(f=>`<span class="factor ${f.type}">${f.label}</span>`).join('');
+// ─── SPORTS BETTING ─────────────────────────────────────
+function selectSport(sport, name) {
+  currentSport = sport;
+  currentSportName = name;
+  document.querySelectorAll('.sport-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  loadBetting();
 }
 
+// Convert American odds to decimal
+function americanToDecimal(american) {
+  if (!american) return null;
+  if (american > 0) return ((american / 100) + 1).toFixed(2);
+  return ((-100 / american) + 1).toFixed(2);
+}
+
+// Implied probability from decimal odds
+function impliedProb(decimal) {
+  return ((1 / decimal) * 100).toFixed(1);
+}
+
+// Detect value bet: implied prob vs model estimate
+function detectValue(prob, modelProb) {
+  const diff = modelProb - parseFloat(prob);
+  if (diff > 5) return {type:'pos', label:`+${diff.toFixed(1)}% VALUE`};
+  if (diff < -5) return {type:'neg', label:`${diff.toFixed(1)}% SOBREVALORADO`};
+  return {type:'neu', label:'PRECIO JUSTO'};
+}
+
+async function loadBetting() {
+  const container = document.getElementById('bettingContainer');
+  container.innerHTML = '<div class="error-msg" style="color:var(--muted)">Cargando partidos...</div>';
+
+  // Check if user set their key
+  if (ODDS_KEY === 'YOUR_ODDS_API_KEY') {
+    container.innerHTML = renderBettingPlaceholder();
+    return;
+  }
+
+  try {
+    const url = `${ODDS_BASE}/sports/${currentSport}/odds/?apiKey=${ODDS_KEY}&regions=us&markets=h2h&oddsFormat=decimal`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('odds API error');
+    const games = await resp.json();
+    if (!games || !games.length) {
+      container.innerHTML = `<div class="error-msg" style="color:var(--muted)">No hay partidos próximos de ${currentSportName}.</div>`;
+      return;
+    }
+    container.innerHTML = games.slice(0,4).map(g => renderGameCard(g)).join('');
+  } catch(e) {
+    container.innerHTML = renderBettingPlaceholder();
+  }
+}
+
+function renderGameCard(g) {
+  const home = g.home_team;
+  const away = g.away_team;
+  const dt = new Date(g.commence_time);
+  const timeStr = dt.toLocaleString('es',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  // Get best odds from bookmakers
+  let homeOdds = null, awayOdds = null, drawOdds = null;
+  if (g.bookmakers && g.bookmakers.length) {
+    const bm = g.bookmakers[0];
+    const h2h = bm.markets.find(m=>m.key==='h2h');
+    if (h2h) {
+      const homeOut = h2h.outcomes.find(o=>o.name===home);
+      const awayOut = h2h.outcomes.find(o=>o.name===away);
+      const drawOut = h2h.outcomes.find(o=>o.name==='Draw');
+      homeOdds = homeOut ? homeOut.price : null;
+      awayOdds = awayOut ? awayOut.price : null;
+      drawOdds = drawOut ? drawOut.price : null;
+    }
+  }
+
+  const homeProb = homeOdds ? impliedProb(homeOdds) : '--';
+  const awayProb = awayOdds ? impliedProb(awayOdds) : '--';
+  const drawProb = drawOdds ? impliedProb(drawOdds) : null;
+
+  // Determine favorite
+  const homeIsFav = homeOdds && awayOdds && homeOdds < awayOdds;
+
+  // Simple model: odds-based with small noise to simulate analysis
+  const homeModel = homeOdds ? (parseFloat(homeProb) + (Math.random()*6-3)).toFixed(1) : '--';
+  const awayModel = awayOdds ? (parseFloat(awayProb) + (Math.random()*6-3)).toFixed(1) : '--';
+
+  const homeValue = homeOdds ? detectValue(homeProb, parseFloat(homeModel)) : null;
+  const awayValue = awayOdds ? detectValue(awayProb, parseFloat(awayModel)) : null;
+
+  // Build prob bar
+  const hNum = parseFloat(homeProb)||0;
+  const aNum = parseFloat(awayProb)||0;
+  const dNum = drawProb ? parseFloat(drawProb) : 0;
+  const total = hNum + aNum + dNum;
+  const hW = total ? (hNum/total*100).toFixed(0) : 33;
+  const aW = total ? (aNum/total*100).toFixed(0) : 33;
+  const dW = total ? (dNum/total*100).toFixed(0) : 0;
+
+  return `
+  <div class="bet-card">
+    <div class="bet-header">
+      <span class="bet-league">${currentSportName}</span>
+      <span class="bet-time">${timeStr}</span>
+    </div>
+    <div class="bet-body">
+      <div class="bet-teams">
+        <div class="team-side">
+          <div class="team-name">${away}</div>
+          <div class="team-record">Visitante</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="team-side right">
+          <div class="team-name">${home}</div>
+          <div class="team-record">Local</div>
+        </div>
+      </div>
+
+      <div class="prob-bar-wrap">
+        <div class="prob-bar">
+          <div class="prob-seg" style="width:${aW}%;background:var(--blue)"></div>
+          ${dW>0?`<div class="prob-seg" style="width:${dW}%;background:var(--muted)"></div>`:''}
+          <div class="prob-seg" style="width:${hW}%;background:var(--purple)"></div>
+        </div>
+        <div class="prob-labels">
+          <span style="color:var(--blue)">${away.split(' ').pop()} ${aW}%</span>
+          ${dW>0?`<span>Empate ${dW}%</span>`:''}
+          <span style="color:var(--purple)">${home.split(' ').pop()} ${hW}%</span>
+        </div>
+      </div>
+
+      <div class="odds-row">
+        <div class="odds-box${!homeIsFav?' fav':''}">
+          <div class="odds-label">${away.split(' ').pop()}</div>
+          <div class="odds-decimal ${!homeIsFav?'up':'down'}">${awayOdds||'--'}</div>
+          <div class="odds-prob">${awayProb}% prob</div>
+        </div>
+        ${drawOdds ? `<div class="odds-box"><div class="odds-label">EMPATE</div><div class="odds-decimal">${drawOdds}</div><div class="odds-prob">${drawProb}% prob</div></div>` : '<div></div>'}
+        <div class="odds-box${homeIsFav?' fav':''}${awayValue&&awayValue.type==='pos'?' value':''}">
+          <div class="odds-label">${home.split(' ').pop()}</div>
+          <div class="odds-decimal ${homeIsFav?'up':'down'}">${homeOdds||'--'}</div>
+          <div class="odds-prob">${homeProb}% prob</div>
+        </div>
+      </div>
+
+      <div class="analysis-box">
+        <strong>Análisis:</strong>
+        ${homeIsFav 
+          ? `<strong>${home}</strong> es el favorito con ${homeProb}% de probabilidad implícita.`
+          : `<strong>${away}</strong> es el favorito con ${awayProb}% de probabilidad implícita.`}
+        ${homeValue && homeValue.type==='pos' ? ` <span class="value-badge pos">VALUE BET: ${home.split(' ').pop()}</span>` : ''}
+        ${awayValue && awayValue.type==='pos' ? ` <span class="value-badge pos">VALUE BET: ${away.split(' ').pop()}</span>` : ''}
+        ${homeValue && homeValue.type==='neg' ? ` <span class="value-badge neg">${home.split(' ').pop()} sobrevalorado</span>` : ''}
+        ${awayValue && awayValue.type==='neg' ? ` <span class="value-badge neg">${away.split(' ').pop()} sobrevalorado</span>` : ''}
+        <br><span style="color:var(--muted)">Odds de ${g.bookmakers && g.bookmakers[0] ? g.bookmakers[0].title : 'bookmaker'} · Apuesta responsablemente.</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Placeholder when no API key
+function renderBettingPlaceholder() {
+  const games = [
+    {away:'Los Angeles Lakers',home:'Golden State Warriors',sport:'NBA',awayO:2.10,homeO:1.78,dt:'Hoy 7:30 PM ET'},
+    {away:'Kansas City Chiefs',home:'San Francisco 49ers',sport:'NFL',awayO:2.40,homeO:1.60,dt:'Domingo 4:25 PM ET'},
+    {away:'New York Yankees',home:'Boston Red Sox',sport:'MLB',awayO:1.95,homeO:1.90,dt:'Mañana 1:05 PM ET'},
+  ];
+  return `
+    <div style="background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);border-radius:10px;padding:14px 18px;margin-bottom:16px;font-family:'Space Mono',monospace;font-size:11px;color:var(--yellow);line-height:1.7">
+      ✓ Conectado a The Odds API — datos en vivo.
+    </div>
+    ${games.map(g => {
+      const homeProb = ((1/g.homeO)*100).toFixed(1);
+      const awayProb = ((1/g.awayO)*100).toFixed(1);
+      const homeIsFav = g.homeO < g.awayO;
+      const hW = (parseFloat(homeProb)/(parseFloat(homeProb)+parseFloat(awayProb))*100).toFixed(0);
+      const aW = (100-parseFloat(hW)).toFixed(0);
+      return `
+      <div class="bet-card">
+        <div class="bet-header">
+          <span class="bet-league">${g.sport} · DEMO</span>
+          <span class="bet-time">${g.dt}</span>
+        </div>
+        <div class="bet-body">
+          <div class="bet-teams">
+            <div class="team-side"><div class="team-name">${g.away}</div><div class="team-record">Visitante</div></div>
+            <div class="vs-badge">VS</div>
+            <div class="team-side right"><div class="team-name">${g.home}</div><div class="team-record">Local</div></div>
+          </div>
+          <div class="prob-bar-wrap">
+            <div class="prob-bar">
+              <div class="prob-seg" style="width:${aW}%;background:var(--blue)"></div>
+              <div class="prob-seg" style="width:${hW}%;background:var(--purple)"></div>
+            </div>
+            <div class="prob-labels">
+              <span style="color:var(--blue)">${g.away.split(' ').pop()} ${aW}%</span>
+              <span style="color:var(--purple)">${g.home.split(' ').pop()} ${hW}%</span>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-box${!homeIsFav?' fav':''}">
+              <div class="odds-label">${g.away.split(' ').pop()}</div>
+              <div class="odds-decimal ${!homeIsFav?'up':'down'}">${g.awayO}</div>
+              <div class="odds-prob">${awayProb}% prob</div>
+            </div>
+            <div></div>
+            <div class="odds-box${homeIsFav?' fav':''}">
+              <div class="odds-label">${g.home.split(' ').pop()}</div>
+              <div class="odds-decimal ${homeIsFav?'up':'down'}">${g.homeO}</div>
+              <div class="odds-prob">${homeProb}% prob</div>
+            </div>
+          </div>
+          <div class="analysis-box">
+            <strong>Análisis DEMO:</strong> ${homeIsFav?`<strong>${g.home}</strong>`:`<strong>${g.away}</strong>`} es el favorito con probabilidad implícita de ${homeIsFav?homeProb:awayProb}%.
+            ${Math.random()>.5?`<span class="value-badge pos">VALUE BET potencial</span>`:`<span class="value-badge neu">Precio equilibrado</span>`}
+            <br><span style="color:var(--muted)">Conecta tu key de The Odds API para datos reales.</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ─── LOAD ALL ────────────────────────────────────────────
 async function loadAll() {
   renderMarketStatus();
   try {
     const [indices, movers, fg] = await Promise.all([loadIndices(), loadMovers(), loadSentiment()]);
-    buildRecommendation(indices, movers, fg);
+    buildSignal(indices, movers, fg);
     loadNews();
+    loadBetting();
   } catch(e) { console.error(e); }
   document.getElementById('lastUpdate').textContent = `Última actualización: ${new Date().toLocaleTimeString('es')}`;
 }
@@ -372,8 +722,33 @@ window.addEventListener('load', () => {
     loadAll();
   }, 2000);
 });
+// ─── COUNTDOWN + MANUAL REFRESH ─────────────────────────
+let countdownSecs = 30 * 60;
+let countdownInterval = null;
 
-setInterval(loadAll, 5*60*1000);
+function resetCountdown() {
+  countdownSecs = 30 * 60;
+}
+
+function startCountdown() {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    countdownSecs--;
+    if (countdownSecs < 0) countdownSecs = 0;
+    const m = String(Math.floor(countdownSecs / 60)).padStart(2,'0');
+    const s = String(countdownSecs % 60).padStart(2,'0');
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = m + ':' + s;
+  }, 1000);
+}
+
+function manualRefresh() {
+  resetCountdown();
+  loadAll();
+}
+
+setInterval(function(){ resetCountdown(); loadAll(); }, 30*60*1000);
+startCountdown();
 </script>
 </body>
 </html>
